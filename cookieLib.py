@@ -32,16 +32,16 @@ def cookiesFromJar(pathObj: Path) -> req.cookies.RequestsCookieJar:
             'domain': cookie[0],
             'path': cookie[1],
             'secure': cookie[2],
-            'expires': None,
+            'expires': cookie[3],
             'discard': True,
             'comment': None,
             'comment_url': None,
             'rest': {'HttpOnly': None},
             'rfc2109': False,
-            'port_specified': None,
-            'domain_specified': None,
+            'port_specified': False,
+            'domain_specified': True,
             'domain_initial_dot': None,
-            'path_specified': None
+            'path_specified': True
         }
         newCookie = req.cookies.cookielib.Cookie(**result) # Create cookie
         temp.set_cookie(newCookie)
