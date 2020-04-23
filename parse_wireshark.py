@@ -52,6 +52,7 @@ def parse_packet(p): #callback function for each packet in capture
         url = p.Host.decode() + p.Path.decode()
        # print(url)
         if(p.Cookie):
+            pkt_cookies_dict = {}
             pkt_cookies = p.Cookie.decode() #string type
             pkt_cookies = pkt_cookies.split("; ")
             num_cookies = len(pkt_cookies)
@@ -59,23 +60,28 @@ def parse_packet(p): #callback function for each packet in capture
             print(type(pkt_cookies))
             driver.get('http://' + url)
             browser_cookies = driver.get_cookies()
-#            
-'''
-still working on parsing the cookies from packets here
+            
+            #create pkt_cookies as a dictionary file
+            for c in range(num_cookies):
+                tmp_list = pkt_cookies[c].split("=", 1)
+                pkt_cookies_dict[tmp_list[0]] = tmp_list[1]
 
             num_bcookies = len(browser_cookies)
+
+            
             for c in range(num_bcookies):
-                for i in range(num_cookies):
-                    for key,value in browser_cookies[c].items(): 
-                        if(key == 'expiry'):
-                            browser_cookies[c]['expiry'] = int(browser_cookies[c]['expiry'])
-                        if(browser_cookies[c]['name'] == pkt_cookies(i)):
-'''
+                for k,v in pkt_cookies_dict.items():
+                    if(browser_cookies[c]['name'] == k):
+                        browser_cookies[c]['value'] = v      
+                for key,value in browser_cookies[c].items():                                                                         
+                        if(type(value) == float):
+                            browser_cookies[c][key] = int(browser_cookies[c][key])
+
             
             driver.delete_all_cookies()
-            for c in range(num_cookies):
+            for c in range(num_bcookies):
                 print(c)
-                driver.add_cookie(cookies[c])
+                driver.add_cookie(browser_cookies[c])
             driver.refresh()
             
 
