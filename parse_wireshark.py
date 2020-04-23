@@ -19,9 +19,9 @@ from selenium.webdriver.common.keys import Keys
 
 
 
-PATH = 'C:/Users/RML/Documents/EC521/project'
-capture = PATH + '/test.pcap'
-driver = webdriver.Chrome(r'C:\Users\RML\Documents\EC521\project\chromedriver.exe')
+PATH = os.getcwd()
+capture = PATH + '\\test.pcap'
+driver = webdriver.Chrome(PATH + "\\chromedriver.exe")
 #driver.maximize_window()
 
 def live_capture():
