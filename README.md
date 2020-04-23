@@ -2,3 +2,4 @@
 
 ## Authors
 Jonathan Galindez
+Rebecca Laher

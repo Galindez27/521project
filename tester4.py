@@ -26,4 +26,3 @@ if __name__ == "__main__":
     get_cookies(cj, ff_cookies)
     s = requests.Session()
     s.cookies = cj
- 

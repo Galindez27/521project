@@ -16,15 +16,18 @@ def scan_site(sitename):
     #cj = http.cookiejar.CookieJar()
     s = requests.Session()
     #s.cookies = cj
+    count = 0
     s.get(sitename);
     for cookie in s.cookies:
+        count += 1
         if (not has_http_only(cookie) or not cookie.secure):
             print ('cookie domain = ' + cookie.domain)
             print('cookie name = ' + cookie.name)
             print('cookie secure = ' + str(cookie.secure))
             print('httponly? ' + str(has_http_only(cookie)))
+    print(s.cookies)
  
 
 #Usage: import tester5, and then call scan_site('url')
 # it will output any cookies that are not secure or dont have httponly enabled
-# ex: scan_site('https://slack.com/')
+scan_site('https://slack.com/')
