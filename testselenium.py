@@ -14,13 +14,20 @@ from selenium.webdriver.common.keys import Keys
 import time
 import re
 
-driver = webdriver.Chrome(r'C:\Users\RML\Documents\EC521\project\chromedriver.exe')
+
+p = os.getcwd()
+dPath = p + "\\chromedriver.exe"
+driver = webdriver.Chrome(dPath)
 #driver.maximize_window()
 session_cookies = []
-driver.get('https://pizzahut.com')
+driver.get('http://www.starbucks.com')
 time.sleep(40) #manual login
 browser_cookies = driver.get_cookies()
  
+
+ ## Create patterns to search for
+testPattern = "(logout)|(log out)|(signout)|(sign out)"
+tester = re.compile(testPattern, re.IGNORECASE)
 
 for c in range(len(browser_cookies)):
     #ensure all floats are ints so can be readded to browser
@@ -34,48 +41,19 @@ for c in range(len(browser_cookies)):
     driver.delete_cookie(browser_cookies[c]['name'])
     print("Deleting {}.".format(browser_cookies[c]['name']))
     driver.refresh()
-    ret = driver.find_elements_by_xpath("(//*[contains(translate(text(), 'LOG OUT', 'log out'), 'log out')])")
-    ret2 = driver.find_elements_by_xpath("(//*[contains(translate(text(), 'SIGN OUT', 'sign out'), 'sign out')])")
-    ret3 = driver.find_elements_by_xpath("(//*[contains(translate(text(), 'LOG IN', 'log in'), 'log in')])")
-    ret4 = driver.find_elements_by_xpath("(//*[contains(translate(text(), 'SIGN IN', 'sign in'), 'sign in')])")
-  #  ret5 = driver.find_elements_by_xpath("(//*[contains(text(), 'logout')])")
-  #  ret6 = driver.find_elements_by_xpath("(//*[contains(text(), 'login')])")
-    if((ret != [] or ret2 != [] ) or (ret3 == [] and ret4 == [])): #or ret5 != [], and ret6 == [])
-        #log/sign out option avial or neither log/sign in avail
-        print("Still logged IN")
-#        print(ret); print("ret: log out present\n")
-#        print(ret2); print("ret2: sign out present\n")
-#        print(ret5); print("ret5: logout is present\n")
-#        print(ret3); print("ret3: log in not present\n")
-#        print(ret4); print("ret4: sign in not present\n")
-#        print(ret6); print("ret6: login not present\n")
-#        
-        
-        continue
-    elif((ret == [] and ret2 == [] ) or (ret3 != [] or ret4 != [] )): #and ret5 == [], or ret6 != [])
-        print("Logged OUT")      
-#        print(ret); print("ret: log out not present\n")
-#        print(ret2); print("ret2: sign out not present\n")
-#        print(ret5); print("ret5: logout not present\n")
-#        print(ret3); print("ret3: log in is present\n")
-#        print(ret4); print("ret4: sign is present\n")
-#        print(ret6); print("ret6: login is present\n")
 
-
-        session_cookies.append(browser_cookies[c]['name'])
-        #log back in
-        for i in range(len(browser_cookies)):
-            driver.add_cookie(browser_cookies[i])
+    if (len(tester.findall(driver.page_source)) > 0):
+        print("Logged in")
     else:
-        print("not right")
+        session_cookies.append(browser_cookies[c])
+        print("Logged out")
         #log back in
-        for i in range(len(browser_cookies)):
-            driver.add_cookie(browser_cookies[i])
+    
+    for cookie in browser_cookies:
+        driver.add_cookie(cookie)
         
 print("Potential session cookies: ")
 print(session_cookies)
-
-    
 
 '''  
 Process for automating finding if a site is vulnerable or not
