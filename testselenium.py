@@ -20,14 +20,16 @@ dPath = p + "\\chromedriver.exe"
 driver = webdriver.Chrome(dPath)
 #driver.maximize_window()
 session_cookies = []
-driver.get('http://www.starbucks.com')
-time.sleep(40) #manual login
+driver.get('http://www.wish.com')
+input() #manual login
 browser_cookies = driver.get_cookies()
  
 
  ## Create patterns to search for
-testPattern = "(logout)|(log out)|(signout)|(sign out)"
-tester = re.compile(testPattern, re.IGNORECASE)
+# testPattern1 = "(logout)|(log out)|(signout)|(sign out)|(my account)|(username)"
+# testPattern2 = "(sign in)|(login)|(log in)|(signin)"
+# tester1 = re.compile(testPattern1, re.IGNORECASE)
+# tester2 = re.compile(testPattern2, re.IGNORECASE)
 
 for c in range(len(browser_cookies)):
     #ensure all floats are ints so can be readded to browser
@@ -42,11 +44,16 @@ for c in range(len(browser_cookies)):
     print("Deleting {}.".format(browser_cookies[c]['name']))
     driver.refresh()
 
-    if (len(tester.findall(driver.page_source)) > 0):
-        print("Logged in")
+    # matches1 = tester1.findall(driver.page_source)
+    # matches2 = tester2.findall(driver.page_source)
+    if (input("Logged out? (y/[n]):") != 'y'):
+        # print("Logged in")
+        # print(matches1)
+        continue
     else:
         session_cookies.append(browser_cookies[c])
-        print("Logged out")
+        # print(matches1)
+        # print("Logged out")
         #log back in
     
     for cookie in browser_cookies:
@@ -54,7 +61,7 @@ for c in range(len(browser_cookies)):
         
 print("Potential session cookies: ")
 print(session_cookies)
-
+driver.close()
 '''  
 Process for automating finding if a site is vulnerable or not
     1) find valid http subdomain (sublister code)
