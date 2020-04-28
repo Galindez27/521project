@@ -79,4 +79,13 @@ def test_site_cookies(target_url: str, login_pattern: str, verbose=False):
 
 if __name__ == "__main__": # Just running this file runs this.
     import pprint
-    pprint.pprint(test_site_cookies("http://www.wish.com", "(Pizzaman)|(Pizzaboy)", verbose=True))
+    targ = "http://wish.com"
+    found_cookies = test_site_cookies(targ, "(Pizzaman)|(Pizzaboy)", verbose=True)
+    pprint.pprint(found_cookies)
+    newDriver = webdriver.Chrome(os.getcwd() + "\\chromedriver.exe")
+    newDriver.get(targ)
+    for cookie in found_cookies['all_sess_cookies']:
+        newDriver.add_cookie(cookie)
+    newDriver.refresh()
+    input("Hit enter when done")
+    newDriver.close()
