@@ -10,17 +10,17 @@ from selenium.webdriver.common.keys import Keys
 import re
 
 def test_site_cookies(target_url: str, login_pattern: str, verbose=False):
-    '''Returns a dictionary of 3 lists
+    '''Returns a dictionary of 5 lists
     {
-        "all_sess_cookies": []
-        "no_secure_flag": []
-        "no_http_only: []
+        "all_sess_cookies": [],
+        "no_secure_flag": [],
+        "no_http_only: [],
+        "all_secure_cookies": [],
+        "all_http_cookies": []
     }
-
+    
     Use verbose=True to see output, defaults to false
     '''
-
-
     p = os.getcwd()
     dPath = p + "\\chromedriver.exe"
     driver = webdriver.Chrome(dPath)
@@ -33,17 +33,24 @@ def test_site_cookies(target_url: str, login_pattern: str, verbose=False):
     #   This could also be extended to look for a specific username
     searcher = re.compile(login_pattern, re.IGNORECASE)
 
-    for c in range(len(browser_cookies)):
-        #ensure all floats are ints so can be readded to browser
-        #have to do as seperate for loop from below in case of log out
-        for key,value in browser_cookies[c].items():                                                                      
-            if(type(value) == float):
-                browser_cookies[c][key] = int(browser_cookies[c][key])
-
     # Lists to be returned
     session_cookies = []
     nohttp = []
     notsecure = []
+    allsecure = []
+    allhttponly = []
+
+    for c in range(len(browser_cookies)):
+        #ensure all floats are ints so can be readded to browser
+        #have to do as seperate for loop from below in case of log out
+        #also pull out all secure and httponly cookies
+        for key,value, in browser_cookies[c].items():                                                                      
+            if(type(value) == float):
+                browser_cookies[c][key] = int(browser_cookies[c][key])
+        if browser_cookies[c]['httpOnly']:
+            allhttponly.append(browser_cookies[c])
+        if browser_cookies[c]['secure']:
+            allsecure.append(browser_cookies[c])
 
     for c in range(len(browser_cookies)):
         # delete cookies 1 by 1 and check if logs you out
@@ -74,14 +81,24 @@ def test_site_cookies(target_url: str, login_pattern: str, verbose=False):
     return {
         "all_sess_cookies": session_cookies,
         "no_secure_flag": notsecure,
-        "no_http_only": nohttp
+        "no_http_only": nohttp,
+        "all_secure_cookies": allsecure,
+        "all_http_cookies": allhttponly
     }
 
-if __name__ == "__main__": # Just running this file runs this.
+if __name__ == "__main__": # Just running this file runs this. Use for demo/Testing
     import pprint
     targ = "http://wish.com"
+
     found_cookies = test_site_cookies(targ, "(Pizzaman)|(Pizzaboy)", verbose=True)
-    pprint.pprint(found_cookies)
+
+    #Print out results
+    print("Num Session Cookies:\t{}".format(len(found_cookies['all_sess_cookies'])))
+    print("Cookie name/values:")
+    for cook in found_cookies['all_sess_cookies']:
+        print((cook['name'], cook['value']))
+
+    #Attempt login from fresh browser
     newDriver = webdriver.Chrome(os.getcwd() + "\\chromedriver.exe")
     newDriver.get(targ)
     for cookie in found_cookies['all_sess_cookies']:
