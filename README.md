@@ -1,5 +1,6 @@
 # 521project
 
 ## Authors
-Jonathan Galindez
-Rebecca Laher
+Jonathan Galindez  
+Rebecca Laher  
+Daniel Crawley
