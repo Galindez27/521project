@@ -9,14 +9,15 @@ def http_subdomains(domain, exhaustive=False):
                                 enable_bruteforce=False, engines=None)
     insecure = []
     for website in subdomains:
-        print('checking http://' + website)
+        #print('checking http://' + website)
         try:
             r = requests.get('http://'+website, timeout=5)
         except:
             continue
         if not 'https' in r.url:
             insecure.append(website)
+            print(website)
             if not exhaustive and len(insecure) > 4:
                 break
     return insecure
-print(http_subdomains('netflix.com'))
+print(http_subdomains('banggood.com'))
