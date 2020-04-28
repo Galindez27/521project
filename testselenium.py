@@ -4,70 +4,79 @@ Created on Fri Apr 24 17:00:31 2020
 
 @author: RML
 """
-
-import sys
 import os
-import scapy.all as scapy  #can use pip scapy install - be sure to add to path manager if using IDE
-from scapy.layers import http as s_http #pip install scapy_http
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import time
 import re
 
+def test_site_cookies(target_url: str, login_pattern: str, verbose=False):
+    '''Returns a dictionary of 3 lists
+    {
+        "all_sess_cookies": []
+        "no_secure_flag": []
+        "no_http_only: []
+    }
 
-p = os.getcwd()
-dPath = p + "\\chromedriver.exe"
-driver = webdriver.Chrome(dPath)
-#driver.maximize_window()
-session_cookies = []
-driver.get('http://www.wish.com')
-input() #manual login
-browser_cookies = driver.get_cookies()
- 
+    Use verbose=True to see output, defaults to false
+    '''
 
- ## Create patterns to search for
-# testPattern1 = "(logout)|(log out)|(signout)|(sign out)|(my account)|(username)"
-# testPattern2 = "(sign in)|(login)|(log in)|(signin)"
-# tester1 = re.compile(testPattern1, re.IGNORECASE)
-# tester2 = re.compile(testPattern2, re.IGNORECASE)
 
-for c in range(len(browser_cookies)):
-    #ensure all floats are ints so can be readded to browser
-    #have to do as seperate for loop from below in case of log out
-    for key,value in browser_cookies[c].items():                                                                      
-        if(type(value) == float):
-            browser_cookies[c][key] = int(browser_cookies[c][key])
+    p = os.getcwd()
+    dPath = p + "\\chromedriver.exe"
+    driver = webdriver.Chrome(dPath)
+    #driver.maximize_window()
+    driver.get(target_url)
+    input("Hit enter when logged in.") #manual login
+    browser_cookies = driver.get_cookies() #Saves initial cookies so we can reset state and use
 
-for c in range(len(browser_cookies)):
-    #delete cookies 1 by 1 and check if logs you out
-    driver.delete_cookie(browser_cookies[c]['name'])
-    print("Deleting {}.".format(browser_cookies[c]['name']))
-    driver.refresh()
+    # Pattern looks for indicators of login. In our test case we look for our name and lastname.
+    #   This could also be extended to look for a specific username
+    searcher = re.compile(login_pattern, re.IGNORECASE)
 
-    # matches1 = tester1.findall(driver.page_source)
-    # matches2 = tester2.findall(driver.page_source)
-    if (input("Logged out? (y/[n]):") != 'y'):
-        # print("Logged in")
-        # print(matches1)
-        continue
-    else:
-        session_cookies.append(browser_cookies[c])
-        # print(matches1)
-        # print("Logged out")
-        #log back in
-    
-    for cookie in browser_cookies:
-        driver.add_cookie(cookie)
+    for c in range(len(browser_cookies)):
+        #ensure all floats are ints so can be readded to browser
+        #have to do as seperate for loop from below in case of log out
+        for key,value in browser_cookies[c].items():                                                                      
+            if(type(value) == float):
+                browser_cookies[c][key] = int(browser_cookies[c][key])
+
+    # Lists to be returned
+    session_cookies = []
+    nohttp = []
+    notsecure = []
+
+    for c in range(len(browser_cookies)):
+        # delete cookies 1 by 1 and check if logs you out
+        driver.delete_cookie(browser_cookies[c]['name'])
+        if verbose:
+            print("Deleting {}.".format(browser_cookies[c]['name']))
+        driver.refresh()
+
+        #Searcher will return None if pattern is not found (if we aren't logged in)
+        m = searcher.search(driver.page_source)
+
+        if(m != None):
+            if verbose:
+                print("logged in")
+        else:
+            if verbose:
+                print("Possible logout")
+            session_cookies.append(browser_cookies[c])
+            if (not browser_cookies[c]['httpOnly']):
+                nohttp.append(browser_cookies[c])
+            if (not browser_cookies[c]['secure']):
+                notsecure.append(browser_cookies[c])
         
-print("Potential session cookies: ")
-print(session_cookies)
-driver.close()
-'''  
-Process for automating finding if a site is vulnerable or not
-    1) find valid http subdomain (sublister code)
-    2) if available, open host url
-    3) manual login/create account
-    4) get cookies delete 1 by 1 
-    5) check if logged in or not
-    6) identify if session cookies have httpOnly/secure flags
-'''
+        for cookie in browser_cookies: #Reset cookies in jar
+            driver.add_cookie(cookie)
+
+    driver.close()
+    return {
+        "all_sess_cookies": session_cookies,
+        "no_secure_flag": notsecure,
+        "no_http_only": nohttp
+    }
+
+if __name__ == "__main__": # Just running this file runs this.
+    import pprint
+    pprint.pprint(test_site_cookies("http://www.wish.com", "(Pizzaman)|(Pizzaboy)", verbose=True))
