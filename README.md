@@ -19,4 +19,4 @@ Only tested on Windows 10 with Google Chrome with Python 3.7 and 3.8.
 
 ## Demos
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/FFfhfCvNXc8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[Demo One](https://youtu.be/FFfhfCvNXc8)
