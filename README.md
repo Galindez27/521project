@@ -1,5 +1,5 @@
 # 521project
-Professor Manuel Egele, BU ENG EC521 Cyberecurity, Spring 2020
+Professor Manuel Egele, BU ENG EC521 Cybersecurity, Spring 2020
 ## Authors
 Jonathan Galindez: galindez@bu.edu
 
