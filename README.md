@@ -19,4 +19,4 @@ Only tested on Windows 10 with Google Chrome with Python 3.7 and 3.8.
 
 ## Demos
 
-[![Demo One](https://youtu.be/FFfhfCvNXc8)]
+![Demo One](https://youtu.be/FFfhfCvNXc8)
